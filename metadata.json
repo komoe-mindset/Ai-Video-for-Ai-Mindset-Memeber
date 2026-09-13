@@ -1,0 +1,6 @@
+{
+  "name": "Myanmar AI Avatar & Video Prompter",
+  "description": "Myanmar AI Avatar & Video Prompt Builder with Gemini AI prompt enhancement, script generation, and 8-second video chunker.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
