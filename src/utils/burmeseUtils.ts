@@ -268,18 +268,46 @@ const GOOGLE_VIDS_STORYBOARD_TEMPLATES: SceneStoryboardTemplate[] = [
 function getTemplateForSceneIndex(index: number, total: number): SceneStoryboardTemplate {
   if (index === 0) return GOOGLE_VIDS_STORYBOARD_TEMPLATES[0];
   if (index === total - 1) return GOOGLE_VIDS_STORYBOARD_TEMPLATES[4];
-  if (total === 3) return GOOGLE_VIDS_STORYBOARD_TEMPLATES[2];
+  if (total === 2) {
+    return GOOGLE_VIDS_STORYBOARD_TEMPLATES[4];
+  }
+  if (total === 3) {
+    return GOOGLE_VIDS_STORYBOARD_TEMPLATES[2]; // Yinzi lace blouse workflow
+  }
   if (total === 4) {
     return index === 1
-      ? GOOGLE_VIDS_STORYBOARD_TEMPLATES[1]
-      : GOOGLE_VIDS_STORYBOARD_TEMPLATES[2];
+      ? GOOGLE_VIDS_STORYBOARD_TEMPLATES[1] // Acheik
+      : GOOGLE_VIDS_STORYBOARD_TEMPLATES[2]; // Yinzi
   }
   return GOOGLE_VIDS_STORYBOARD_TEMPLATES[index % GOOGLE_VIDS_STORYBOARD_TEMPLATES.length];
 }
 
+function getSceneTitle(index: number, total: number, fallbackTitle: string): string {
+  const sceneNum = index + 1;
+  if (total === 2) {
+    return index === 0
+      ? 'အခန်း ၁ - မိတ်ဆက် (Scene 1: Introduction)'
+      : 'အခန်း ၂ - နိဂုံး & ဆောင်ရွက်ချက် (Scene 2: Summary & Call to Action)';
+  }
+  if (total === 3) {
+    if (index === 0) return 'အခန်း ၁ - မိတ်ဆက် (Scene 1: Introduction)';
+    if (index === 1) return 'အခန်း ၂ - အဓိက အချက်အလက် (Scene 2: Core Concept & Workflow)';
+    return 'အခန်း ၃ - နိဂုံး & ဆောင်ရွက်ချက် (Scene 3: Summary & Call to Action)';
+  }
+  if (total === 4) {
+    if (index === 0) return 'အခန်း ၁ - မိတ်ဆက် (Scene 1: Introduction)';
+    if (index === 1) return 'အခန်း ၂ - အဓိက အယူအဆ (Scene 2: Core Concept)';
+    if (index === 2) return 'အခန်း ၃ - လက်တွေ့ အသုံးချမှု (Scene 3: Practical Workflow)';
+    return 'အခန်း ၄ - နိဂုံး & ဆောင်ရွက်ချက် (Scene 4: Summary & Call to Action)';
+  }
+  return fallbackTitle
+    .replace(/အခန်း \d+/, `အခန်း ${sceneNum}`)
+    .replace(/Scene \d+/, `Scene ${sceneNum}`);
+}
+
 function deriveOnScreenText(narration: string, fallback: string, sceneNum: number): string {
   if (!narration) return fallback;
-  const firstSentence = narration.split(/[။၊\n]/)[0].trim();
+  const firstSentence = narration.split(/[။၊\n,]/)[0].trim();
   const tokens = firstSentence.split(/\s+/).filter(Boolean);
   if (tokens.length >= 1 && tokens.length <= 7) {
     return `အချက် ${sceneNum} • ${firstSentence}`;
@@ -290,72 +318,91 @@ function deriveOnScreenText(narration: string, fallback: string, sceneNum: numbe
 }
 
 /**
- * Splits a Burmese script by sentence terminators ('။' and newlines),
- * and intelligently groups them into 3 to 5 coherent Google Vids scenes
- * with syllable-paced duration estimation, authentic Myanmar cultural attire,
- * English slide layouts, and avatar gesture directives.
+ * Splits a Burmese script by sentence terminators ('။' and newlines) or clause boundaries,
+ * and intelligently groups them into 2 to 5 coherent Google Vids scenes
+ * with syllable-paced duration estimation (clamped 5s - 20s), authentic Myanmar cultural attire
+ * (Taikpon, Acheik, Yinzi), 16:9 modern minimalist English slide layouts, and avatar gesture directives.
  */
 export function generateGoogleVidsScenes(script: string): GoogleVidsScene[] {
-  const cleanText = script.trim();
-  if (!cleanText) return [];
+  const cleanText = (script || '').trim();
 
-  // Split Burmese script by sentence terminators ('။' and newlines)
-  let rawSentences = cleanText
-    .split(/(?<=[။\n])/)
+  // 1. Handle empty strings or whitespace-only strings gracefully without returning empty arrays
+  const textToProcess =
+    cleanText ||
+    'မင်္ဂလာပါခင်ဗျာ။ ဤတင်ဆက်မှုတွင် အဓိက အကြောင်းအရာနှင့် နည်းဗျူဟာများကို စနစ်တကျ ရှင်းပြပေးသွားပါမည်။ လက်တွေ့ အသုံးချနိုင်မည့် အဆင့်များကို အတူတကွ ဆက်လက် လေ့လာကြည့်ရှုလိုက်ပါ။';
+
+  // 2. Sentence terminators splitting ('။', newlines, '!', '?')
+  let segments = textToProcess
+    .split(/(?<=[။\n!?])/)
     .map((s) => s.trim())
     .filter(Boolean);
 
-  // If fewer than 3 sentences, try splitting by Myanmar comma '၊' or standard commas
-  if (rawSentences.length < 3) {
-    rawSentences = cleanText
-      .split(/(?<=[။၊\n,])/)
+  // If fewer than 3 sentences, divide logically into 2 or 3 scenes based on comma ('၊') pauses or clause boundaries
+  if (segments.length < 3) {
+    const commaSplits = textToProcess
+      .split(/(?<=[၊,;])/)
       .map((s) => s.trim())
       .filter(Boolean);
-  }
 
-  // Ensure at least 3 logical units for coherent 3 to 5 scene generation
-  const sentences = [...rawSentences];
-  while (sentences.length < 3) {
-    let longestIdx = 0;
-    for (let i = 1; i < sentences.length; i++) {
-      if (sentences[i].length > sentences[longestIdx].length) {
-        longestIdx = i;
+    if (commaSplits.length >= 2) {
+      segments = commaSplits;
+    } else {
+      // Split by common Burmese conjunctions / clause boundaries
+      const conjunctionRegex =
+        /\s*(?:နှင့်|ပြီးနောက်|ပြီးလျှင်|ဖြစ်ပြီး|ထို့ကြောင့်|ထို့နောက်|ဒါ့အပြင်|သို့သော်|ပြီးတော့)\s+/;
+      if (conjunctionRegex.test(textToProcess)) {
+        segments = textToProcess
+          .split(conjunctionRegex)
+          .map((s) => s.trim())
+          .filter(Boolean);
       }
     }
-    const item = sentences[longestIdx];
-    const words = item.split(/\s+/).filter(Boolean);
-    if (words.length > 1) {
-      const mid = Math.ceil(words.length / 2);
-      sentences.splice(
-        longestIdx,
-        1,
-        words.slice(0, mid).join(' '),
-        words.slice(mid).join(' ')
-      );
-    } else if (item.length > 6) {
-      const mid = Math.ceil(item.length / 2);
-      sentences.splice(
-        longestIdx,
-        1,
-        item.slice(0, mid).trim(),
-        item.slice(mid).trim()
-      );
-    } else {
-      sentences.push(item);
+  }
+
+  // If still a single continuous sentence/segment, split into 2 or 3 balanced clauses rather than creating a bloated single scene
+  if (segments.length === 1) {
+    const single = segments[0];
+    const words = single.split(/\s+/).filter(Boolean);
+    if (words.length >= 6) {
+      // Divide into 2 or 3 scenes depending on length
+      if (words.length >= 12) {
+        const third = Math.ceil(words.length / 3);
+        segments = [
+          words.slice(0, third).join(' '),
+          words.slice(third, third * 2).join(' '),
+          words.slice(third * 2).join(' '),
+        ];
+      } else {
+        const mid = Math.ceil(words.length / 2);
+        segments = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+      }
+    } else if (single.length >= 24) {
+      const mid = Math.ceil(single.length / 2);
+      segments = [single.slice(0, mid).trim(), single.slice(mid).trim()];
     }
   }
 
-  // Target between 3 and 5 scenes
-  const targetScenes = Math.min(5, Math.max(3, Math.min(sentences.length, 5)));
+  // Clean trailing punctuation on each segment so commas don't clash with sentence terminators
+  const cleanedSegments = segments.map((seg) => seg.replace(/[၊,;]+$/, '').trim()).filter(Boolean);
 
-  // Intelligently group sentences into buckets
+  // Target between 2 and 5 scenes (divide short scripts into 2 or 3 scenes, longer into up to 5)
+  let targetScenes = Math.min(5, Math.max(2, cleanedSegments.length));
+  if (cleanedSegments.length <= 2) {
+    targetScenes = 2;
+  } else if (cleanedSegments.length === 3) {
+    targetScenes = 3;
+  } else if (cleanedSegments.length === 4) {
+    targetScenes = 4;
+  }
+
+  // Intelligently group segments into buckets
   const sceneBuckets: string[][] = Array.from({ length: targetScenes }, () => []);
-  sentences.forEach((sentence, idx) => {
+  cleanedSegments.forEach((segment, idx) => {
     const bucketIdx = Math.min(
       targetScenes - 1,
-      Math.floor((idx * targetScenes) / sentences.length)
+      Math.floor((idx * targetScenes) / cleanedSegments.length)
     );
-    sceneBuckets[bucketIdx].push(sentence);
+    sceneBuckets[bucketIdx].push(segment);
   });
 
   return sceneBuckets.map((bucket, idx) => {
@@ -363,17 +410,19 @@ export function generateGoogleVidsScenes(script: string): GoogleVidsScene[] {
     let narration = bucket.join(' ').trim();
 
     // Ensure clean Burmese sentence termination
+    narration = narration.replace(/[၊,;]+$/, '').trim();
     if (narration && !/[။!?]$/.test(narration)) {
       narration += '။';
     }
 
-    // Estimate duration using Burmese syllable pacing:
-    // ~3.5 syllables per second, minimum 5s, maximum 15s per slide
+    // 3. Clamp maximum scene duration between 5 seconds and 20 seconds
+    // Burmese syllable pacing: ~3.5 syllables per second
     const syllables = countBurmeseSyllables(narration);
     const calculatedDuration = Math.round(syllables / 3.5);
-    const estDuration = Math.min(15, Math.max(5, calculatedDuration));
+    const estDuration = Math.min(20, Math.max(5, calculatedDuration));
 
     const template = getTemplateForSceneIndex(idx, targetScenes);
+    const title = getSceneTitle(idx, targetScenes, template.defaultTitle);
     const onScreenText = deriveOnScreenText(
       narration,
       template.defaultOnScreen,
@@ -382,7 +431,7 @@ export function generateGoogleVidsScenes(script: string): GoogleVidsScene[] {
 
     return {
       sceneNumber: sceneNum,
-      title: template.defaultTitle,
+      title,
       narration,
       slideVisual: template.slideVisual,
       onScreenText,

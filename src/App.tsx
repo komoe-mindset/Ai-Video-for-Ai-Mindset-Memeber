@@ -361,6 +361,7 @@ export default function App() {
 
               {(activeTab === 'googleVids' || (activeTab as string) === 'googlevids') && (
                 <GoogleVidsTab
+                  confirmedScript={confirmedScript || chunkerScript || scriptConfig.optionB || scriptConfig.optionA}
                   script={confirmedScript || chunkerScript || scriptConfig.optionB || scriptConfig.optionA}
                   onShowToast={showToast}
                   onSwitchTab={(tab) => setActiveTab(tab as TabKey)}
