@@ -161,11 +161,13 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               </h3>
             </div>
             <button
+              type="button"
               onClick={onOpenGemModal}
-              className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
+              aria-label="Gemini Gem အလုပ်လုပ်ပုံ အသေးစိတ် ညွှန်ကြားချက်များ ကြည့်ရှုရန် (View Gem Instructions)"
+              className="text-xs text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>ကြည့်ရှုရန်</span>
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-3 h-3" aria-hidden="true" />
             </button>
           </div>
 
@@ -214,22 +216,24 @@ export const GuideTab: React.FC<GuideTabProps> = ({
                 Gem System Instruction အပြည့်အစုံ
               </span>
               <button
+                type="button"
                 onClick={() =>
                   onCopy(
                     GEM_SYSTEM_INSTRUCTION,
                     'Gemini Gem Instructions အားလုံးကို Copy ယူပြီးပါပြီ!'
                   )
                 }
-                className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+                aria-label="Gemini Gem Instructions အားလုံးကို Copy ယူပါ"
+                className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer"
               >
                 {copiedKey === GEM_SYSTEM_INSTRUCTION ? (
                   <>
-                    <Check className="w-3.5 h-3.5" />
+                    <Check className="w-3.5 h-3.5" aria-hidden="true" />
                     <span>Copied</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5" />
+                    <Copy className="w-3.5 h-3.5" aria-hidden="true" />
                     <span>Copy Instructions</span>
                   </>
                 )}
@@ -243,11 +247,12 @@ export const GuideTab: React.FC<GuideTabProps> = ({
               href={GEMINI_GEM_URL}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Gemini Gem သို့ တိုက်ရိုက် သွားရောက်ရန် (Opens Gemini Gem in a new tab)"
               className="mt-2 w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-purple-950/60 to-indigo-950/60 hover:from-purple-900/60 hover:to-indigo-900/60 border border-purple-500/40 text-purple-200 text-xs font-semibold flex items-center justify-center gap-2 transition active:scale-95 group shadow-sm"
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-400 group-hover:rotate-12 transition" />
+              <Sparkles className="w-3.5 h-3.5 text-purple-400 group-hover:rotate-12 transition" aria-hidden="true" />
               <span>Gemini Gem သို့ တိုက်ရိုက် သွားရောက်ရန်</span>
-              <ExternalLink className="w-3.5 h-3.5 text-purple-400 opacity-80" />
+              <ExternalLink className="w-3.5 h-3.5 text-purple-400 opacity-80" aria-hidden="true" />
             </a>
           </div>
         </div>

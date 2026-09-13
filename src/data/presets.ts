@@ -1,4 +1,4 @@
-import { AvatarConfig } from '../types';
+import { AvatarConfig, ScriptConfig } from '../types';
 
 export const GEMINI_GEM_URL =
   'https://gemini.google.com/gem/1ovsqxG_MOuB1VPHxkjGtPKAOmoIJBl0h?usp=sharing';
@@ -59,6 +59,17 @@ export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
   bgCustomDetail: 'Clean soft warm rim lighting, blurred bokeh plants in background',
   aspectRatio: '--ar 9:16',
   cameraFraming: 'Medium close-up portrait, chest up',
+};
+
+export const INITIAL_SCRIPT_CONFIG: ScriptConfig = {
+  topic:
+    'အွန်လိုင်းကနေ AI သုံးပြီး တစ်လ ဒေါ်လာ ၅၀၀ ရှာဖွေနိုင်မယ့် လျှို့ဝှက်ချက် ၃ ခုကို မျှဝေပေးခြင်း',
+  tone: 'friendly',
+  lang: 'burmese',
+  optionA:
+    'မင်္ဂလာပါ! အွန်လိုင်းကနေ AI သုံးပြီး တစ်လ ဒေါ်လာ ၅၀၀ ရှာဖွေနိုင်မယ့် လျှို့ဝှက်ချက် ၃ ခုကို မျှဝေပေးခြင်း နဲ့ ပတ်သက်ပြီး လူတိုင်းသိထားသင့်တဲ့ အလွယ်ဆုံးနည်းလမ်းလေးကို ဒီ ၈ စက္ကန့်အတွင်းမှာ မျှဝေပေးချင်ပါတယ်ခင်ဗျာ။ အခုပဲ စမ်းကြည့်လိုက်ပါ။',
+  optionB:
+    'မင်္ဂလာပါခင်ဗျာ။ ဒီနေ့မှာတော့ အွန်လိုင်းကနေ AI သုံးပြီး တစ်လ ဒေါ်လာ ၅၀၀ ရှာဖွေနိုင်မယ့် လျှို့ဝှက်ချက် ၃ ခုကို မျှဝေပေးခြင်း အကြောင်းကို အသေးစိတ် ရှင်းပြပေးသွားပါမယ်။ လူအများစု သတိမထားမိကြတဲ့ အဓိက အချက် ၂ ချက်ရှိပါတယ်။ ပထမအချက်ကတော့ အချိန်ကို မှန်ကန်စွာ စီမံခန့်ခွဲဖို့ဖြစ်ပြီး၊ ဒုတိယအချက်ကတော့ စနစ်တကျ လက်တွေ့လေ့ကျင့်ဖို့ ဖြစ်ပါတယ်။ ဒီအဆင့်တွေကို လိုက်လုပ်ရုံနဲ့ သိသာတဲ့ ရလဒ်ကောင်းတွေ ချက်ချင်း ရရှိလာမှာ သေချာပါတယ်ခင်ဗျာ။',
 };
 
 export const PRESETS: Record<string, Partial<AvatarConfig>> = {

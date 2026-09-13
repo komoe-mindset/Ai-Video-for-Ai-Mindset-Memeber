@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import { Navbar } from './components/Navbar';
 import { TabNav, TabKey } from './components/TabNav';
-import { AvatarTab } from './components/AvatarTab';
-import { ScriptTab } from './components/ScriptTab';
-import { VideoChunkerTab } from './components/VideoChunkerTab';
-import { GuideTab } from './components/GuideTab';
 import { GemGuideModal } from './components/GemGuideModal';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { ToastContainer } from './components/Toast';
 import { ReferenceToolsBar } from './components/ReferenceToolsBar';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { TabLoadingSkeleton } from './components/TabLoadingSkeleton';
 import {
   AvatarConfig,
   ScriptConfig,
@@ -17,12 +15,28 @@ import {
   VideoChunk,
   ToastNotification,
 } from './types';
-import { DEFAULT_AVATAR_CONFIG } from './data/presets';
+import { DEFAULT_AVATAR_CONFIG, INITIAL_SCRIPT_CONFIG } from './data/presets';
 import {
   buildEnglishAvatarPrompt,
   chunkScriptFor8Seconds,
   generateLocalScripts,
 } from './utils/burmeseUtils';
+
+// 1. Dynamic code-splitting for tab components
+const AvatarTab = lazy(() =>
+  import('./components/AvatarTab').then((m) => ({ default: m.AvatarTab }))
+);
+const ScriptTab = lazy(() =>
+  import('./components/ScriptTab').then((m) => ({ default: m.ScriptTab }))
+);
+const VideoChunkerTab = lazy(() =>
+  import('./components/VideoChunkerTab').then((m) => ({
+    default: m.VideoChunkerTab,
+  }))
+);
+const GuideTab = lazy(() =>
+  import('./components/GuideTab').then((m) => ({ default: m.GuideTab }))
+);
 
 export default function App() {
   // Navigation State
@@ -32,37 +46,31 @@ export default function App() {
   const [avatarConfig, setAvatarConfig] =
     useState<AvatarConfig>(DEFAULT_AVATAR_CONFIG);
 
-  // Script State
-  const initialLocal = generateLocalScripts(
-    'အွန်လိုင်းကနေ AI သုံးပြီး တစ်လ ဒေါ်လာ ၅၀၀ ရှာဖွေနိုင်မယ့် လျှို့ဝှက်ချက် ၃ ခုကို မျှဝေပေးခြင်း',
-    'friendly',
-    'burmese'
-  );
-  const [scriptConfig, setScriptConfig] = useState<ScriptConfig>({
-    topic:
-      'အွန်လိုင်းကနေ AI သုံးပြီး တစ်လ ဒေါ်လာ ၅၀၀ ရှာဖွေနိုင်မယ့် လျှို့ဝှက်ချက် ၃ ခုကို မျှဝေပေးခြင်း',
-    tone: 'friendly',
-    lang: 'burmese',
-    optionA: initialLocal.optionA,
-    optionB: initialLocal.optionB,
-  });
+  // Script State (Lightweight static initialization without heavy computations)
+  const [scriptConfig, setScriptConfig] =
+    useState<ScriptConfig>(INITIAL_SCRIPT_CONFIG);
 
-  // Video Chunker State
+  // Video Chunker State (Deferred computation on initial load)
   const [chunkerScript, setChunkerScript] = useState<string>(
-    initialLocal.optionB
+    INITIAL_SCRIPT_CONFIG.optionB
   );
   const [chunkVariation, setChunkVariation] =
     useState<ActionVariation>('dynamic');
   const [chunkViewMode, setChunkViewMode] = useState<ChunkViewMode>('step');
   const [currentChunkIndex, setCurrentChunkIndex] = useState<number>(0);
-  const [chunks, setChunks] = useState<VideoChunk[]>(() =>
-    chunkScriptFor8Seconds(initialLocal.optionB, 'dynamic')
-  );
+  const [chunks, setChunks] = useState<VideoChunk[]>([]);
+
+  // Defer chunking until user navigates to video tab
+  useEffect(() => {
+    if (activeTab === 'video' && chunks.length === 0 && chunkerScript) {
+      setChunks(chunkScriptFor8Seconds(chunkerScript, chunkVariation));
+    }
+  }, [activeTab, chunks.length, chunkerScript, chunkVariation]);
 
   // Modals & UI State
   const [isGemModalOpen, setIsGemModalOpen] = useState<boolean>(false);
   const [isApiModalOpen, setIsApiModalOpen] = useState<boolean>(false);
-  const [hasServerAi, setHasServerAi] = useState<boolean>(true);
+  const [hasServerAi, setHasServerAi] = useState<boolean>(false);
   const [isEnhancing, setIsEnhancing] = useState<boolean>(false);
   const [isGeneratingScript, setIsGeneratingScript] = useState<boolean>(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -78,7 +86,6 @@ export default function App() {
         }
       })
       .catch(() => {
-        // Fallback gracefully
         setHasServerAi(false);
       });
   }, []);
@@ -282,56 +289,69 @@ export default function App() {
         {/* Quick Reference Tools Bar */}
         <ReferenceToolsBar />
 
-        {/* Tab Content Display */}
-        <div className="w-full">
-          {activeTab === 'avatar' && (
-            <AvatarTab
-              config={avatarConfig}
-              onChange={setAvatarConfig}
-              onGoToScript={() => setActiveTab('script')}
-              onCopy={handleCopy}
-              onEnhanceWithAI={handleEnhanceAvatarPrompt}
-              isEnhancing={isEnhancing}
-              copiedKey={copiedKey}
-            />
-          )}
+        {/* Tab Content Display with Error Boundary and Suspense code-splitting */}
+        <div
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+          tabIndex={0}
+          className="w-full outline-none"
+        >
+          <ErrorBoundary
+            fallbackTitle="ဤအပိုင်းကို ဖွင့်ရာတွင် အမှားဖြစ်ပေါ်ခဲ့ပါသည်"
+            onReset={() => setActiveTab('avatar')}
+          >
+            <Suspense fallback={<TabLoadingSkeleton />}>
+              {activeTab === 'avatar' && (
+                <AvatarTab
+                  config={avatarConfig}
+                  onChange={setAvatarConfig}
+                  onGoToScript={() => setActiveTab('script')}
+                  onCopy={handleCopy}
+                  onEnhanceWithAI={handleEnhanceAvatarPrompt}
+                  isEnhancing={isEnhancing}
+                  copiedKey={copiedKey}
+                />
+              )}
 
-          {activeTab === 'script' && (
-            <ScriptTab
-              config={scriptConfig}
-              onChange={setScriptConfig}
-              onSendToChunker={handleSendToChunker}
-              onGenerateAI={handleGenerateScriptWithAI}
-              isGenerating={isGeneratingScript}
-              onCopy={handleCopy}
-              copiedKey={copiedKey}
-            />
-          )}
+              {activeTab === 'script' && (
+                <ScriptTab
+                  config={scriptConfig}
+                  onChange={setScriptConfig}
+                  onSendToChunker={handleSendToChunker}
+                  onGenerateAI={handleGenerateScriptWithAI}
+                  isGenerating={isGeneratingScript}
+                  onCopy={handleCopy}
+                  copiedKey={copiedKey}
+                />
+              )}
 
-          {activeTab === 'video' && (
-            <VideoChunkerTab
-              scriptText={chunkerScript}
-              onScriptChange={setChunkerScript}
-              variation={chunkVariation}
-              onVariationChange={setChunkVariation}
-              onRunChunker={handleRunChunker}
-              chunks={chunks}
-              viewMode={chunkViewMode}
-              onViewModeChange={setChunkViewMode}
-              currentStepIndex={currentChunkIndex}
-              onStepChange={setCurrentChunkIndex}
-              onCopy={handleCopy}
-              copiedKey={copiedKey}
-            />
-          )}
+              {activeTab === 'video' && (
+                <VideoChunkerTab
+                  scriptText={chunkerScript}
+                  onScriptChange={setChunkerScript}
+                  variation={chunkVariation}
+                  onVariationChange={setChunkVariation}
+                  onRunChunker={handleRunChunker}
+                  chunks={chunks}
+                  viewMode={chunkViewMode}
+                  onViewModeChange={setChunkViewMode}
+                  currentStepIndex={currentChunkIndex}
+                  onStepChange={setCurrentChunkIndex}
+                  onCopy={handleCopy}
+                  copiedKey={copiedKey}
+                />
+              )}
 
-          {activeTab === 'guide' && (
-            <GuideTab
-              onCopy={handleCopy}
-              copiedKey={copiedKey}
-              onOpenGemModal={() => setIsGemModalOpen(true)}
-            />
-          )}
+              {activeTab === 'guide' && (
+                <GuideTab
+                  onCopy={handleCopy}
+                  copiedKey={copiedKey}
+                  onOpenGemModal={() => setIsGemModalOpen(true)}
+                />
+              )}
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </main>
 

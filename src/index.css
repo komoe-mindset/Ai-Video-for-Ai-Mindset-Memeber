@@ -1,13 +1,39 @@
 @import "tailwindcss";
 
 @layer base {
+  @font-face {
+    font-family: 'Noto Sans Myanmar';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: local('Noto Sans Myanmar'), local('NotoSansMyanmar');
+  }
+
+  @font-face {
+    font-family: 'Pyidaungsu';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: local('Pyidaungsu');
+  }
+
+  @font-face {
+    font-family: 'Padauk';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: local('Padauk');
+  }
+
   body {
-    font-family: 'Inter', 'Pyidaungsu', 'Padauk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 .font-burmese {
-  font-family: 'Pyidaungsu', 'Padauk', sans-serif;
+  font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', sans-serif;
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeLegibility;
 }
 
 /* Custom scrollbar */

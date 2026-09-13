@@ -30,11 +30,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenGemModal }) => {
         {/* Action Buttons */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           <button
+            type="button"
             onClick={onOpenGemModal}
-            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 transition active:scale-95"
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 transition active:scale-95 cursor-pointer"
             title="Gem System Instructions"
+            aria-label="Gemini Gem လမ်းညွှန်ချက်များ ဖွင့်ရန် (Open Gem System Instructions)"
           >
-            <BookOpen className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <BookOpen className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
             <span className="hidden sm:inline">Gem လမ်းညွှန်ချက်များ</span>
             <span className="sm:hidden text-[11px]">လမ်းညွှန်</span>
           </button>
@@ -45,12 +47,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenGemModal }) => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-xl bg-gradient-to-r from-purple-950/60 to-indigo-950/60 hover:from-purple-900/60 hover:to-indigo-900/60 text-purple-200 border border-purple-500/40 transition active:scale-95 shadow-sm"
             title="Open Gemini Gem"
+            aria-label="Gemini Gem စာမျက်နှာသို့ သွားရောက်ရန် (Opens Gemini Gem in a new tab)"
           >
-            <Sparkles className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+            <Sparkles className="w-3.5 h-3.5 text-purple-400 shrink-0" aria-hidden="true" />
             <span className="text-[11px] sm:text-xs font-semibold">
               Gemini Gem သို့ သွားမည်
             </span>
-            <ExternalLink className="w-3 h-3 text-purple-400 shrink-0 opacity-80" />
+            <ExternalLink className="w-3 h-3 text-purple-400 shrink-0 opacity-80" aria-hidden="true" />
           </a>
         </div>
       </div>

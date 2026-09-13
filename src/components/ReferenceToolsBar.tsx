@@ -38,11 +38,12 @@ export const ReferenceToolsBar: React.FC<ReferenceToolsBarProps> = ({ variant = 
             href={tool.url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`${tool.name} - ${tool.nameMm} (Opens Gemini Share in a new tab)`}
             className="glass-card p-3.5 rounded-xl border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between group active:scale-98"
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <div className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center" aria-hidden="true">
                   {getIcon(tool.category)}
                 </div>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
@@ -61,7 +62,7 @@ export const ReferenceToolsBar: React.FC<ReferenceToolsBarProps> = ({ variant = 
             </div>
             <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 group-hover:text-emerald-400 transition">
               <span>Gemini Share ဖွင့်မည်</span>
-              <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition" />
+              <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition" aria-hidden="true" />
             </div>
           </a>
         ))}
@@ -72,7 +73,7 @@ export const ReferenceToolsBar: React.FC<ReferenceToolsBarProps> = ({ variant = 
   return (
     <div className="w-full bg-slate-900/70 border border-slate-800/90 rounded-2xl p-2.5 sm:p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5">
       <div className="flex items-center gap-2 shrink-0">
-        <div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+        <div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center" aria-hidden="true">
           <Sparkles className="w-3.5 h-3.5" />
         </div>
         <div>
@@ -92,14 +93,15 @@ export const ReferenceToolsBar: React.FC<ReferenceToolsBarProps> = ({ variant = 
             href={tool.url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`${tool.name}: ${tool.description} (Opens Gemini Share in a new tab)`}
             className={`px-2.5 py-1.5 rounded-xl border text-xs font-medium inline-flex items-center gap-1.5 transition active:scale-95 shadow-sm ${getStyle(
               tool.category
             )}`}
             title={`${tool.name} - ${tool.description}`}
           >
-            {getIcon(tool.category)}
+            <span aria-hidden="true">{getIcon(tool.category)}</span>
             <span className="text-[11px] font-semibold">{tool.name}</span>
-            <ExternalLink className="w-3 h-3 opacity-70 ml-0.5" />
+            <ExternalLink className="w-3 h-3 opacity-70 ml-0.5" aria-hidden="true" />
           </a>
         ))}
       </div>

@@ -270,16 +270,18 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
                 ~ {wordsA} words ({estSecondsA}s)
               </span>
               <button
+                type="button"
                 onClick={() =>
                   onCopy(config.optionA, 'Option A Script ကို ကူးယူပြီးပါပြီ!')
                 }
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
                 title="Copy Script A"
+                aria-label="Option A စကားပြော စာသားကို Copy ယူပါ (Copy Option A Script)"
               >
                 {copiedKey === config.optionA ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <Check className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
                 ) : (
-                  <Copy className="w-3.5 h-3.5" />
+                  <Copy className="w-3.5 h-3.5" aria-hidden="true" />
                 )}
               </button>
             </div>
@@ -322,16 +324,18 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
                 ~ {wordsB} words ({estSecondsB}s)
               </span>
               <button
+                type="button"
                 onClick={() =>
                   onCopy(config.optionB, 'Option B Script ကို ကူးယူပြီးပါပြီ!')
                 }
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
                 title="Copy Script B"
+                aria-label="Option B စကားပြော စာသားကို Copy ယူပါ (Copy Option B Script)"
               >
                 {copiedKey === config.optionB ? (
-                  <Check className="w-3.5 h-3.5 text-blue-400" />
+                  <Check className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
                 ) : (
-                  <Copy className="w-3.5 h-3.5" />
+                  <Copy className="w-3.5 h-3.5" aria-hidden="true" />
                 )}
               </button>
             </div>

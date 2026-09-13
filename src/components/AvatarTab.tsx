@@ -585,19 +585,21 @@ export const AvatarTab: React.FC<AvatarTabProps> = ({
               <span>မြန်မာလို ရှင်းပြချက် (Gemini Gem Step 3)</span>
             </h4>
             <button
+              type="button"
               onClick={() =>
                 onCopy(
                   burmeseExplanation,
                   'မြန်မာလို ရှင်းပြချက်ကို ကူးယူပြီးပါပြီ!'
                 )
               }
-              className="text-xs text-slate-400 hover:text-white p-1 rounded-md transition"
+              className="text-xs text-slate-400 hover:text-white p-1 rounded-md transition cursor-pointer"
               title="Copy"
+              aria-label="မြန်မာလို ရှင်းပြချက်ကို Copy ယူပါ (Copy Burmese explanation)"
             >
               {copiedKey === burmeseExplanation ? (
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <Check className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
               ) : (
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-3.5 h-3.5" aria-hidden="true" />
               )}
             </button>
           </div>
