@@ -1,14 +1,15 @@
 import React from 'react';
-import { Sparkles, BookOpen, ExternalLink } from 'lucide-react';
+import { Sparkles, BookOpen, ExternalLink, LogOut } from 'lucide-react';
 import { GEMINI_GEM_URL } from '../data/presets';
 
 interface NavbarProps {
   onOpenGemModal: () => void;
   onOpenApiModal?: () => void;
   hasServerAi?: boolean;
+  onLogout?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenGemModal }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenGemModal, onLogout }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
@@ -55,6 +56,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenGemModal }) => {
             </span>
             <ExternalLink className="w-3 h-3 text-purple-400 shrink-0 opacity-80" aria-hidden="true" />
           </a>
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-medium rounded-xl bg-slate-900/90 hover:bg-red-950/50 text-slate-400 hover:text-red-300 border border-slate-800 hover:border-red-500/40 transition active:scale-95 cursor-pointer ml-0.5"
+              title="Lock / Logout (လော့ဂ်အောက်ထွက်မည်)"
+              aria-label="လော့ဂ်အောက်ထွက်မည် (Sign out of studio)"
+            >
+              <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden md:inline font-burmese text-[11px]">ထွက်မည်</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

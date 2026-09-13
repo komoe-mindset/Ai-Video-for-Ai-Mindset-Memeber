@@ -7,6 +7,7 @@ import { ToastContainer } from './components/Toast';
 import { ReferenceToolsBar } from './components/ReferenceToolsBar';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { TabLoadingSkeleton } from './components/TabLoadingSkeleton';
+import { LoginPage } from './components/LoginPage';
 import {
   AvatarConfig,
   ScriptConfig,
@@ -82,6 +83,57 @@ export default function App() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
 
+  // Toast helper
+  const showToast = useCallback(
+    (message: string, type: 'success' | 'info' | 'warning' = 'success') => {
+      const id = Math.random().toString(36).substring(2, 9);
+      setToasts((prev) => [...prev, { id, message, type }]);
+
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, 3200);
+    },
+    []
+  );
+
+  // Authentication State for Protected Access (Password: AiMindset)
+  const AUTH_KEY = 'aimindset_access_token';
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      return (
+        localStorage.getItem(AUTH_KEY) === 'true' ||
+        sessionStorage.getItem(AUTH_KEY) === 'true'
+      );
+    } catch {
+      return false;
+    }
+  });
+
+  const handleLoginSuccess = useCallback((remember: boolean) => {
+    try {
+      if (remember) {
+        localStorage.setItem(AUTH_KEY, 'true');
+      } else {
+        sessionStorage.setItem(AUTH_KEY, 'true');
+      }
+    } catch {
+      // Ignore storage errors
+    }
+    setIsAuthenticated(true);
+    showToast('Studio သို့ အောင်မြင်စွာ ဝင်ရောက်ပြီးပါပြီ! ✨');
+  }, [showToast]);
+
+  const handleLogout = useCallback(() => {
+    try {
+      localStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem(AUTH_KEY);
+    } catch {
+      // Ignore storage errors
+    }
+    setIsAuthenticated(false);
+    showToast('လော့ဂ်အောက်ထွက်ပြီးပါပြီ');
+  }, [showToast]);
+
   // Check server API status on mount
   useEffect(() => {
     fetch('/api/status')
@@ -95,19 +147,6 @@ export default function App() {
         setHasServerAi(false);
       });
   }, []);
-
-  // Toast helper
-  const showToast = useCallback(
-    (message: string, type: 'success' | 'info' | 'warning' = 'success') => {
-      const id = Math.random().toString(36).substring(2, 9);
-      setToasts((prev) => [...prev, { id, message, type }]);
-
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 3200);
-    },
-    []
-  );
 
   // Clipboard copy helper with fallback for iframes
   const handleCopy = useCallback(
@@ -284,6 +323,16 @@ export default function App() {
     showToast('Script များကို သင့်တော်သော လေသံဖြင့် အသင့်ပြင်ဆင်ပေးထားပါသည်');
   };
 
+  // Gate with LoginPage if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white">
+        <ToastContainer toasts={toasts} />
+        <LoginPage onLoginSuccess={handleLoginSuccess} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white pb-12">
       {/* Toast Notification Container */}
@@ -294,6 +343,7 @@ export default function App() {
         onOpenGemModal={() => setIsGemModalOpen(true)}
         onOpenApiModal={() => setIsApiModalOpen(true)}
         hasServerAi={hasServerAi}
+        onLogout={handleLogout}
       />
 
       {/* Main Container */}

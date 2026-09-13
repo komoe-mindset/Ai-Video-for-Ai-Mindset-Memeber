@@ -31,6 +31,18 @@ app.get('/api/status', (req, res) => {
   res.json({ status: 'ok', hasKey, model: 'gemini-3.8-flash' });
 });
 
+// Verify login password
+app.post('/api/auth/verify', (req, res) => {
+  const { password } = req.body;
+  const expectedPassword = process.env.APP_PASSWORD || 'AiMindset';
+  const trimmed = typeof password === 'string' ? password.trim() : '';
+
+  if (trimmed === expectedPassword) {
+    return res.json({ valid: true });
+  }
+  return res.status(401).json({ valid: false, error: 'Invalid password' });
+});
+
 // API endpoint to enhance avatar prompt
 app.post('/api/gemini/enhance-prompt', async (req, res) => {
   try {
