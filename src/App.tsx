@@ -34,6 +34,7 @@ const VideoChunkerTab = lazy(() =>
     default: m.VideoChunkerTab,
   }))
 );
+const GoogleVidsTab = React.lazy(() => import('./components/GoogleVidsTab'));
 const GuideTab = lazy(() =>
   import('./components/GuideTab').then((m) => ({ default: m.GuideTab }))
 );
@@ -49,6 +50,11 @@ export default function App() {
   // Script State (Lightweight static initialization without heavy computations)
   const [scriptConfig, setScriptConfig] =
     useState<ScriptConfig>(INITIAL_SCRIPT_CONFIG);
+
+  // Confirmed Script State (passed to Google Vids Storyboard and Chunker)
+  const [confirmedScript, setConfirmedScript] = useState<string>(
+    INITIAL_SCRIPT_CONFIG.optionB
+  );
 
   // Video Chunker State (Deferred computation on initial load)
   const [chunkerScript, setChunkerScript] = useState<string>(
@@ -160,12 +166,21 @@ export default function App() {
 
   // Transition from Script Tab to Chunker Tab
   const handleSendToChunker = (text: string) => {
+    setConfirmedScript(text);
     setChunkerScript(text);
     const calculated = chunkScriptFor8Seconds(text, chunkVariation);
     setChunks(calculated);
     setCurrentChunkIndex(0);
     setActiveTab('video');
     showToast('Script ကို ၈ စက္ကန့် စနစ်သို့ ပို့ဆောင်ပြီးပါပြီ');
+  };
+
+  // Transition from Script Tab to Google Vids Storyboard Tab
+  const handleSendToGoogleVids = (text: string) => {
+    setConfirmedScript(text);
+    setChunkerScript(text);
+    setActiveTab('googleVids');
+    showToast('Script ကို Google Vids Storyboard သို့ ပို့ဆောင်ပြီးပါပြီ! 🎬');
   };
 
   // Gemini AI: Enhance Avatar Prompt
@@ -319,6 +334,7 @@ export default function App() {
                   config={scriptConfig}
                   onChange={setScriptConfig}
                   onSendToChunker={handleSendToChunker}
+                  onSendToGoogleVids={handleSendToGoogleVids}
                   onGenerateAI={handleGenerateScriptWithAI}
                   isGenerating={isGeneratingScript}
                   onCopy={handleCopy}
@@ -326,7 +342,7 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'video' && (
+              {(activeTab === 'video' || (activeTab as string) === 'videoChunker') && (
                 <VideoChunkerTab
                   scriptText={chunkerScript}
                   onScriptChange={setChunkerScript}
@@ -340,6 +356,14 @@ export default function App() {
                   onStepChange={setCurrentChunkIndex}
                   onCopy={handleCopy}
                   copiedKey={copiedKey}
+                />
+              )}
+
+              {(activeTab === 'googleVids' || (activeTab as string) === 'googlevids') && (
+                <GoogleVidsTab
+                  script={confirmedScript || chunkerScript || scriptConfig.optionB || scriptConfig.optionA}
+                  onShowToast={showToast}
+                  onSwitchTab={(tab) => setActiveTab(tab as TabKey)}
                 />
               )}
 

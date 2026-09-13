@@ -11,6 +11,7 @@ import {
   Heart,
   Radio,
   ExternalLink,
+  Clapperboard,
 } from 'lucide-react';
 import { ScriptConfig, ScriptTone, ScriptLang } from '../types';
 import { countWordsBurmese, generateLocalScripts } from '../utils/burmeseUtils';
@@ -20,6 +21,7 @@ interface ScriptTabProps {
   config: ScriptConfig;
   onChange: (newConfig: ScriptConfig) => void;
   onSendToChunker: (text: string) => void;
+  onSendToGoogleVids?: (text: string) => void;
   onGenerateAI?: () => void;
   isGenerating?: boolean;
   onCopy: (text: string, msg: string) => void;
@@ -30,6 +32,7 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
   config,
   onChange,
   onSendToChunker,
+  onSendToGoogleVids,
   onGenerateAI,
   isGenerating,
   onCopy,
@@ -299,12 +302,24 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
               <Clock className="w-3 h-3 shrink-0" />
               <span>ခန့်မှန်းကြာချိန်: ၈ စက္ကန့်ခန့် (Shot ၁ ခုတည်းနှင့် ပြီးပြည့်စုံပါသည်)</span>
             </span>
-            <button
-              onClick={() => onSendToChunker(config.optionA)}
-              className="w-full sm:w-auto px-3 py-1.5 text-xs rounded-lg bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600 hover:text-white border border-emerald-500/30 transition text-center"
-            >
-              အဆင့် ၃ သို့ ပို့မည် &rarr;
-            </button>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => onSendToGoogleVids?.(config.optionA)}
+                className="w-full sm:w-auto px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-950/40 cursor-pointer"
+                title="Google Vids Storyboard သို့ ပို့မည်"
+              >
+                <Clapperboard className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Google Vids Storyboard သို့ ပို့မည်</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onSendToChunker(config.optionA)}
+                className="w-full sm:w-auto px-3 py-1.5 text-xs rounded-lg bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600 hover:text-white border border-emerald-500/30 transition text-center cursor-pointer"
+              >
+                ၈ စက္ကန့် အပိုင်းများ &rarr;
+              </button>
+            </div>
           </div>
         </div>
 
@@ -353,11 +368,71 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
               <Layers className="w-3 h-3 shrink-0" />
               <span>ရှည်လျားသော စာသားဖြစ်၍ ၈ စက္ကန့် အပိုင်းများ ခွဲရန် အကြံပြုပါသည်</span>
             </span>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => onSendToGoogleVids?.(config.optionB)}
+                className="w-full sm:w-auto px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-950/40 cursor-pointer"
+                title="Google Vids Storyboard သို့ ပို့မည်"
+              >
+                <Clapperboard className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Google Vids Storyboard သို့ ပို့မည်</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onSendToChunker(config.optionB)}
+                className="w-full sm:w-auto px-3 py-1.5 text-xs rounded-lg bg-blue-600/20 text-blue-300 hover:bg-blue-600 hover:text-white border border-blue-500/30 transition font-medium text-center cursor-pointer"
+              >
+                ၈ စက္ကန့် အပိုင်းများ ခွဲမည် &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Confirmed Script Quick Actions Bar */}
+        <div className="glass-card p-3.5 sm:p-4 rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-emerald-950/30 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+              <Clapperboard className="w-4 h-4" aria-hidden="true" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
+                အတည်ပြုပြီးသော စကားပြော (Confirmed Script Action)
+              </span>
+              <p className="text-xs text-slate-300 font-burmese">
+                စကားပြောကို Google Vids သို့မဟုတ် Video Chunker စနစ်သို့ ပို့ဆောင်ပါ
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             <button
-              onClick={() => onSendToChunker(config.optionB)}
-              className="w-full sm:w-auto px-3 py-1.5 text-xs rounded-lg bg-blue-600/20 text-blue-300 hover:bg-blue-600 hover:text-white border border-blue-500/30 transition font-medium text-center"
+              type="button"
+              onClick={() => {
+                const target = config.optionB || config.optionA;
+                onCopy(target, 'အတည်ပြုပြီးသော စကားပြော Script ကို ကူးယူပြီးပါပြီ!');
+              }}
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer border border-slate-700/80"
+              title="Copy Confirmed Script"
+              aria-label="အတည်ပြုပြီးသော စကားပြော Script ကို Copy ယူပါ"
             >
-              ၈ စက္ကန့် အပိုင်းများ ခွဲမည် &rarr;
+              <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onSendToChunker(config.optionB || config.optionA)}
+              className="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer flex items-center gap-1.5 font-burmese"
+            >
+              <Layers className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
+              <span>Send to Chunker</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onSendToGoogleVids?.(config.optionB || config.optionA)}
+              className="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/40 cursor-pointer font-burmese"
+            >
+              <Clapperboard className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Google Vids Storyboard သို့ ပို့မည် (Send to Google Vids)</span>
             </button>
           </div>
         </div>

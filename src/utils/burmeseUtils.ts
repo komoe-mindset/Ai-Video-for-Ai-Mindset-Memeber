@@ -1,4 +1,4 @@
-import { ActionVariation, AvatarConfig, VideoChunk } from '../types';
+import { ActionVariation, AvatarConfig, GoogleVidsScene, VideoChunk } from '../types';
 
 export function countWordsBurmese(str: string): number {
   if (!str) return 0;
@@ -183,6 +183,211 @@ export function chunkScriptFor8Seconds(
       scriptBurmese: chunkText,
       videoPrompt: `Animate the uploaded avatar. ${act} Maintain character identity, consistent clothing, and lighting.`,
       wordCount: countWordsBurmese(chunkText),
+    };
+  });
+}
+
+/**
+ * Counts Burmese syllables based on consonant onsets (excluding asat killers)
+ * and independent vowels, with proportional weighting for mixed English terms.
+ */
+export function countBurmeseSyllables(text: string): number {
+  if (!text) return 0;
+  const clean = text.replace(/[။၊,.?!:;"'()\-—]/g, ' ').trim();
+  if (!clean) return 0;
+
+  // Burmese syllable onsets: consonants not followed by asat (\u103A), plus independent vowels (\u1023-\u102A),
+  // Great Sa (\u103F), and Myanmar letter ဉ/ၐ/ etc.
+  const burmeseConsonantsNotAsat = clean.match(
+    /[\u1000-\u1021\u103F\u1023-\u102A\u104E](?!\u103A)/g
+  );
+  const burmeseCount = burmeseConsonantsNotAsat ? burmeseConsonantsNotAsat.length : 0;
+
+  // Mixed English words
+  const englishWords = clean.match(/[a-zA-Z0-9]+/g);
+  let englishSyllables = 0;
+  if (englishWords) {
+    for (const word of englishWords) {
+      englishSyllables += Math.max(1, Math.ceil(word.length / 3));
+    }
+  }
+
+  return Math.max(1, burmeseCount + englishSyllables);
+}
+
+interface SceneStoryboardTemplate {
+  defaultTitle: string;
+  defaultOnScreen: string;
+  slideVisual: string;
+  avatarMotion: string;
+}
+
+const GOOGLE_VIDS_STORYBOARD_TEMPLATES: SceneStoryboardTemplate[] = [
+  {
+    defaultTitle: 'အခန်း ၁ - မိတ်ဆက် (Scene 1: Introduction)',
+    defaultOnScreen: 'နိဒါန်း • အဓိက အကြောင်းအရာနှင့် ရည်ရွယ်ချက်',
+    slideVisual:
+      '16:9 widescreen presentation slide, modern minimalist corporate tech aesthetic, avatar circle placeholder on bottom-right featuring an avatar in a modern Taikpon jacket with crisp mandarin collar, clean typography layout with subtle glassmorphism container and balanced negative space.',
+    avatarMotion:
+      'Medium close-up, confident presentation stance, subtle nod, open palm gesture toward slide content, direct eye contact with warm welcoming expression.',
+  },
+  {
+    defaultTitle: 'အခန်း ၂ - အဓိက အယူအဆ (Scene 2: Core Concept)',
+    defaultOnScreen: 'အဓိက အချက် • စနစ်တကျ ပြင်ဆင်ခြင်းနှင့် နည်းဗျူဟာ',
+    slideVisual:
+      '16:9 widescreen presentation slide, modern minimalist corporate tech aesthetic, clean infographic card layout with dual-tone emerald and slate styling, avatar circle placeholder on bottom-left featuring an avatar in an elegant traditional Acheik pattern silk scarf and formal attire, clean typography layout with glowing pillar badges.',
+    avatarMotion:
+      'Waist-up framing, dynamic conversational hand gestures explaining concepts, subtle head tilt, articulate lip movements synchronized with Burmese speech.',
+  },
+  {
+    defaultTitle: 'အခန်း ၃ - လက်တွေ့ အသုံးချမှု (Scene 3: Practical Workflow)',
+    defaultOnScreen: 'အဆင့်ဆင့် လုပ်ဆောင်ချက် • ထိရောက်သော အသုံးချနည်းများ',
+    slideVisual:
+      '16:9 widescreen presentation slide, modern minimalist corporate tech aesthetic, three-pillar workflow diagram with sleek glowing directional vectors, avatar circle placeholder on bottom-right featuring an avatar in an elegant Yinzi lace blouse with subtle Myanmar floral motif, clean typography layout.',
+    avatarMotion:
+      'Medium shot, attentive and professional posture, points smoothly toward on-screen diagram, calm affirmative blinking, precise cadence.',
+  },
+  {
+    defaultTitle: 'အခန်း ၄ - အကျိုးကျေးဇူး (Scene 4: Key Results & Impact)',
+    defaultOnScreen: 'အကျိုးကျေးဇူး • တိုင်းတာနိုင်သော အောင်မြင်မှု ရလဒ်များ',
+    slideVisual:
+      '16:9 widescreen presentation slide, modern minimalist corporate tech aesthetic, bold metric visualization with circular progress gauge and verified checkmark cards, avatar circle placeholder on bottom-left wearing tailored modern Myanmar silk attire with Acheik patterns, clean typography layout.',
+    avatarMotion:
+      'Medium close-up, enthusiastic and reassuring expression, emphatic two-handed gesture highlighting key metric, radiant smile.',
+  },
+  {
+    defaultTitle: 'အခန်း ၅ - နိဂုံး & ဆောင်ရွက်ချက် (Scene 5: Summary & Call to Action)',
+    defaultOnScreen: 'နိဂုံးချုပ် • ယခုပဲ လက်တွေ့ စတင်လိုက်ပါ',
+    slideVisual:
+      '16:9 widescreen presentation slide, modern minimalist corporate tech aesthetic, high-impact concluding layout with prominent call-to-action banner, interactive scan placeholder, avatar circle placeholder on bottom-right featuring an avatar in a traditional formal modern Taikpon jacket and Acheik pattern silk Longyi, clean typography layout.',
+    avatarMotion:
+      'Close-up cut, warm closing smile, graceful traditional polite hand placement, friendly concluding nod toward audience.',
+  },
+];
+
+function getTemplateForSceneIndex(index: number, total: number): SceneStoryboardTemplate {
+  if (index === 0) return GOOGLE_VIDS_STORYBOARD_TEMPLATES[0];
+  if (index === total - 1) return GOOGLE_VIDS_STORYBOARD_TEMPLATES[4];
+  if (total === 3) return GOOGLE_VIDS_STORYBOARD_TEMPLATES[2];
+  if (total === 4) {
+    return index === 1
+      ? GOOGLE_VIDS_STORYBOARD_TEMPLATES[1]
+      : GOOGLE_VIDS_STORYBOARD_TEMPLATES[2];
+  }
+  return GOOGLE_VIDS_STORYBOARD_TEMPLATES[index % GOOGLE_VIDS_STORYBOARD_TEMPLATES.length];
+}
+
+function deriveOnScreenText(narration: string, fallback: string, sceneNum: number): string {
+  if (!narration) return fallback;
+  const firstSentence = narration.split(/[။၊\n]/)[0].trim();
+  const tokens = firstSentence.split(/\s+/).filter(Boolean);
+  if (tokens.length >= 1 && tokens.length <= 7) {
+    return `အချက် ${sceneNum} • ${firstSentence}`;
+  } else if (tokens.length > 7) {
+    return `အချက် ${sceneNum} • ${tokens.slice(0, 5).join(' ')}...`;
+  }
+  return fallback;
+}
+
+/**
+ * Splits a Burmese script by sentence terminators ('။' and newlines),
+ * and intelligently groups them into 3 to 5 coherent Google Vids scenes
+ * with syllable-paced duration estimation, authentic Myanmar cultural attire,
+ * English slide layouts, and avatar gesture directives.
+ */
+export function generateGoogleVidsScenes(script: string): GoogleVidsScene[] {
+  const cleanText = script.trim();
+  if (!cleanText) return [];
+
+  // Split Burmese script by sentence terminators ('။' and newlines)
+  let rawSentences = cleanText
+    .split(/(?<=[။\n])/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  // If fewer than 3 sentences, try splitting by Myanmar comma '၊' or standard commas
+  if (rawSentences.length < 3) {
+    rawSentences = cleanText
+      .split(/(?<=[။၊\n,])/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  // Ensure at least 3 logical units for coherent 3 to 5 scene generation
+  const sentences = [...rawSentences];
+  while (sentences.length < 3) {
+    let longestIdx = 0;
+    for (let i = 1; i < sentences.length; i++) {
+      if (sentences[i].length > sentences[longestIdx].length) {
+        longestIdx = i;
+      }
+    }
+    const item = sentences[longestIdx];
+    const words = item.split(/\s+/).filter(Boolean);
+    if (words.length > 1) {
+      const mid = Math.ceil(words.length / 2);
+      sentences.splice(
+        longestIdx,
+        1,
+        words.slice(0, mid).join(' '),
+        words.slice(mid).join(' ')
+      );
+    } else if (item.length > 6) {
+      const mid = Math.ceil(item.length / 2);
+      sentences.splice(
+        longestIdx,
+        1,
+        item.slice(0, mid).trim(),
+        item.slice(mid).trim()
+      );
+    } else {
+      sentences.push(item);
+    }
+  }
+
+  // Target between 3 and 5 scenes
+  const targetScenes = Math.min(5, Math.max(3, Math.min(sentences.length, 5)));
+
+  // Intelligently group sentences into buckets
+  const sceneBuckets: string[][] = Array.from({ length: targetScenes }, () => []);
+  sentences.forEach((sentence, idx) => {
+    const bucketIdx = Math.min(
+      targetScenes - 1,
+      Math.floor((idx * targetScenes) / sentences.length)
+    );
+    sceneBuckets[bucketIdx].push(sentence);
+  });
+
+  return sceneBuckets.map((bucket, idx) => {
+    const sceneNum = idx + 1;
+    let narration = bucket.join(' ').trim();
+
+    // Ensure clean Burmese sentence termination
+    if (narration && !/[။!?]$/.test(narration)) {
+      narration += '။';
+    }
+
+    // Estimate duration using Burmese syllable pacing:
+    // ~3.5 syllables per second, minimum 5s, maximum 15s per slide
+    const syllables = countBurmeseSyllables(narration);
+    const calculatedDuration = Math.round(syllables / 3.5);
+    const estDuration = Math.min(15, Math.max(5, calculatedDuration));
+
+    const template = getTemplateForSceneIndex(idx, targetScenes);
+    const onScreenText = deriveOnScreenText(
+      narration,
+      template.defaultOnScreen,
+      sceneNum
+    );
+
+    return {
+      sceneNumber: sceneNum,
+      title: template.defaultTitle,
+      narration,
+      slideVisual: template.slideVisual,
+      onScreenText,
+      avatarMotion: template.avatarMotion,
+      estDuration,
     };
   });
 }

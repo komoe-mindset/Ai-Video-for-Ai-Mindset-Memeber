@@ -1,6 +1,14 @@
 import React, { useRef } from 'react';
+import { Clapperboard } from 'lucide-react';
 
-export type TabKey = 'avatar' | 'script' | 'video' | 'guide';
+export type TabKey =
+  | 'avatar'
+  | 'script'
+  | 'googleVids'
+  | 'video'
+  | 'videoChunker'
+  | 'googlevids'
+  | 'guide';
 
 interface TabNavProps {
   activeTab: TabKey;
@@ -8,7 +16,13 @@ interface TabNavProps {
 }
 
 export const TabNav: React.FC<TabNavProps> = ({ activeTab, onTabChange }) => {
-  const tabs: { key: TabKey; num: string; label: string; sub: string }[] = [
+  const tabs: {
+    key: TabKey;
+    num: string;
+    label: string;
+    sub: string;
+    icon?: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+  }[] = [
     {
       key: 'avatar',
       num: '၁',
@@ -22,14 +36,21 @@ export const TabNav: React.FC<TabNavProps> = ({ activeTab, onTabChange }) => {
       sub: 'စကားပြော ၂ မျိုး ဖန်တီးခြင်း',
     },
     {
-      key: 'video',
+      key: 'googleVids',
       num: '၃',
+      label: 'Google Vids Flow',
+      sub: 'Slides & Vids အခန်းခွဲစနစ်',
+      icon: Clapperboard,
+    },
+    {
+      key: 'video',
+      num: '၄',
       label: '၈ စက္ကန့် Video ခွဲခြမ်းခြင်း',
       sub: '8s Rule အပိုင်းများ ခွဲထုတ်ခြင်း',
     },
     {
       key: 'guide',
-      num: '၄',
+      num: '၅',
       label: 'ဝေါဟာရ & လမ်းညွှန်',
       sub: 'Gem Prompt & စကားလုံးများ',
     },
@@ -69,10 +90,13 @@ export const TabNav: React.FC<TabNavProps> = ({ activeTab, onTabChange }) => {
       <div
         role="tablist"
         aria-label="အဆင့်များ ရွေးချယ်ရန် (Workflow Steps)"
-        className="grid grid-cols-2 md:grid-cols-4 gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner"
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner"
       >
         {tabs.map((t, idx) => {
-          const isActive = activeTab === t.key;
+          const isActive =
+            activeTab === t.key ||
+            (t.key === 'googleVids' && (activeTab as string) === 'googlevids');
+          const IconComponent = t.icon;
           return (
             <button
               key={t.key}
@@ -100,7 +124,11 @@ export const TabNav: React.FC<TabNavProps> = ({ activeTab, onTabChange }) => {
                     : 'bg-slate-800 text-slate-400'
                 }`}
               >
-                {t.num}
+                {IconComponent ? (
+                  <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300" aria-hidden="true" />
+                ) : (
+                  t.num
+                )}
               </span>
               <div className="min-w-0 flex-1 leading-tight">
                 <span className="block truncate font-semibold text-[11px] sm:text-xs md:text-sm">

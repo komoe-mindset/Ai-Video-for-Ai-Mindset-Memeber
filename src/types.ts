@@ -48,3 +48,13 @@ export interface ToastNotification {
   message: string;
   type?: 'success' | 'info' | 'warning';
 }
+
+export interface GoogleVidsScene {
+  sceneNumber: number;
+  title: string;
+  narration: string; // Pure Burmese TTS text
+  slideVisual: string; // Slide visual composition directive in English
+  onScreenText: string; // Concise bullet/title
+  avatarMotion: string; // Avatar gesture directive in English
+  estDuration: number; // Duration in seconds
+}
