@@ -14,6 +14,8 @@ import {
   Shirt,
   Image as ImageIcon,
   ExternalLink,
+  Package,
+  Smile,
 } from 'lucide-react';
 import { AvatarConfig, AvatarStyle } from '../types';
 import {
@@ -21,7 +23,7 @@ import {
   buildBurmeseExplanation,
   buildGemAnswer,
 } from '../utils/burmeseUtils';
-import { PRESETS, GEMINI_GEM_URL } from '../data/presets';
+import { PRESETS, GEMINI_GEM_URL, REFERENCE_TOOLS } from '../data/presets';
 
 interface AvatarTabProps {
   config: AvatarConfig;
@@ -167,6 +169,55 @@ export const AvatarTab: React.FC<AvatarTabProps> = ({
             >
               <span>👔 Corporate Guy</span>
             </button>
+          </div>
+        </div>
+
+        {/* AI Video Reference Image Tools (Product, Cartoon Scene, Cartoon Avatar) */}
+        <div className="glass-card p-3 sm:p-3.5 rounded-2xl border border-slate-800 bg-slate-900/60">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <h3 className="text-xs font-bold text-slate-200">
+                AI Video Reference Tools (ရုပ်ပုံ & နောက်ခံ ထုတ်လုပ်ရန်)
+              </h3>
+            </div>
+            <span className="text-[10px] text-slate-400 font-burmese">
+              AI Video ထဲ Reference ပေးရန် သုံးပါ
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {REFERENCE_TOOLS.map((tool) => (
+              <a
+                key={tool.id}
+                href={tool.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 sm:p-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-900 border border-slate-800/90 hover:border-slate-700 transition flex items-center justify-between group active:scale-95 shadow-sm"
+                title={`${tool.name} - ${tool.description}`}
+              >
+                <div className="min-w-0 pr-1">
+                  <div className="flex items-center gap-1.5">
+                    {tool.category === 'product' && (
+                      <Package className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    )}
+                    {tool.category === 'scene' && (
+                      <ImageIcon className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    )}
+                    {tool.category === 'avatar' && (
+                      <Smile className="w-3.5 h-3.5 text-pink-400 shrink-0" />
+                    )}
+                    <span className="text-[11px] font-semibold text-slate-200 group-hover:text-white truncate">
+                      {tool.name}
+                    </span>
+                  </div>
+                  <p className="text-[9px] sm:text-[10px] text-slate-400 font-burmese truncate mt-0.5">
+                    {tool.nameMm}
+                  </p>
+                </div>
+                <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-emerald-400 shrink-0 transition" />
+              </a>
+            ))}
           </div>
         </div>
 

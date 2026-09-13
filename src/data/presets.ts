@@ -3,6 +3,49 @@ import { AvatarConfig } from '../types';
 export const GEMINI_GEM_URL =
   'https://gemini.google.com/gem/1ovsqxG_MOuB1VPHxkjGtPKAOmoIJBl0h?usp=sharing';
 
+export interface ReferenceTool {
+  id: string;
+  name: string;
+  nameMm: string;
+  description: string;
+  url: string;
+  badge: string;
+  category: 'product' | 'scene' | 'avatar';
+}
+
+export const REFERENCE_TOOLS: ReferenceTool[] = [
+  {
+    id: 'product-studio',
+    name: 'Product Image Studio',
+    nameMm: 'ကုန်ပစ္စည်း ဓာတ်ပုံ စတူဒီယို',
+    description:
+      'ကုန်ပစ္စည်းကြော်ငြာနှင့် AI Video ထဲ ထည့်သွင်းမည့် Product Reference Image များ ထုတ်လုပ်ရန်',
+    url: 'https://gemini.google.com/share/2a43a27a3f3c?skid=b22d3e5a-3872-452a-b9eb-a21970086db1',
+    badge: 'Product Reference',
+    category: 'product',
+  },
+  {
+    id: 'cartoon-scene',
+    name: '2D Cartoon Scene Compositor',
+    nameMm: '2D ကာတွန်း နောက်ခံအခင်းအကျင်း',
+    description:
+      'ကာတွန်း ဗီဒီယိုများအတွက် အခန်းနောက်ခံ (Scene & Environment) Reference Image ရေးဆွဲရန်',
+    url: 'https://gemini.google.com/share/40f1d88c578c?skid=1e5489bd-ff2c-4a55-8cb1-239b86d622f3',
+    badge: 'Scene Reference',
+    category: 'scene',
+  },
+  {
+    id: 'cartoon-avatar',
+    name: '2D Cartoon Avatar Compositor',
+    nameMm: '2D ကာတွန်း ဇာတ်ကောင် Avatar',
+    description:
+      '2D ကာတွန်းဇာတ်ကောင်နှင့် ကာတွန်း Avatar Reference ရုပ်ပုံများ တည်ဆောက်ရန်',
+    url: 'https://gemini.google.com/share/0bfacba66746?skid=0164a496-4aa1-4d84-918f-c0e9f2d04307',
+    badge: 'Cartoon Avatar',
+    category: 'avatar',
+  },
+];
+
 export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
   style: 'hyperrealistic',
   gender: 'female',

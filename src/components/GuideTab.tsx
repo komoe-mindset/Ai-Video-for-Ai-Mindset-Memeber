@@ -8,6 +8,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { VOCABULARY_ITEMS, GEM_SYSTEM_INSTRUCTION, GEMINI_GEM_URL } from '../data/presets';
+import { ReferenceToolsBar } from './ReferenceToolsBar';
 
 interface GuideTabProps {
   onCopy: (text: string, msg: string) => void;
@@ -250,6 +251,22 @@ export const GuideTab: React.FC<GuideTabProps> = ({
             </a>
           </div>
         </div>
+      </div>
+
+      {/* Dedicated Section: AI Video Reference Image Studios */}
+      <div className="lg:col-span-12 glass-card p-4 sm:p-5 rounded-2xl border border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+              <span>AI Video Reference Image Studios (Gemini Prompts)</span>
+            </h3>
+            <p className="text-xs text-slate-400 font-burmese mt-0.5">
+              AI Video (Kling, Runway, Hailuo, Luma) များတွင် Reference Image အဖြစ် ထည့်သွင်းအသုံးပြုနိုင်သော Gemini Studio လင့်ခ်များ
+            </p>
+          </div>
+        </div>
+        <ReferenceToolsBar variant="cards" />
       </div>
     </div>
   );

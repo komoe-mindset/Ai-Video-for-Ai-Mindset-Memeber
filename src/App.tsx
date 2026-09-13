@@ -8,6 +8,7 @@ import { GuideTab } from './components/GuideTab';
 import { GemGuideModal } from './components/GemGuideModal';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { ToastContainer } from './components/Toast';
+import { ReferenceToolsBar } from './components/ReferenceToolsBar';
 import {
   AvatarConfig,
   ScriptConfig,
@@ -277,6 +278,9 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-4 sm:gap-6">
         {/* Step Progress Tabs */}
         <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* Quick Reference Tools Bar */}
+        <ReferenceToolsBar />
 
         {/* Tab Content Display */}
         <div className="w-full">
