@@ -16,6 +16,7 @@ import {
   Sliders,
   Play,
   Layers,
+  Maximize2,
 } from 'lucide-react';
 import { REFERENCE_TOOLS, ReferenceTool } from '../data/presets';
 
@@ -154,6 +155,8 @@ export const ReferenceToolsBar: React.FC<ReferenceToolsBarProps> = ({
         return <ImageIcon className="w-3.5 h-3.5 text-cyan-400 shrink-0" />;
       case 'avatar':
         return <Smile className="w-3.5 h-3.5 text-pink-400 shrink-0" />;
+      case 'upscale':
+        return <Maximize2 className="w-3.5 h-3.5 text-violet-400 shrink-0" />;
     }
   };
 
@@ -165,6 +168,8 @@ export const ReferenceToolsBar: React.FC<ReferenceToolsBarProps> = ({
         return 'bg-cyan-950/30 hover:bg-cyan-900/40 text-cyan-200 border-cyan-500/30 hover:border-cyan-400/60';
       case 'avatar':
         return 'bg-pink-950/30 hover:bg-pink-900/40 text-pink-200 border-pink-500/30 hover:border-pink-400/60';
+      case 'upscale':
+        return 'bg-violet-950/30 hover:bg-violet-900/40 text-violet-200 border-violet-500/30 hover:border-violet-400/60';
     }
   };
 
@@ -503,15 +508,15 @@ export const ReferenceToolsBar: React.FC<ReferenceToolsBarProps> = ({
           </div>
         </div>
 
-        {/* 3 Gemini Reference Tools */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* 4 Gemini Reference Tools */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {REFERENCE_TOOLS.map((tool) => (
             <a
               key={tool.id}
               href={tool.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${tool.name} - ${tool.nameMm} (Opens Gemini Share in a new tab)`}
+              aria-label={`${tool.name} - ${tool.nameMm} (${tool.url.includes('/gem/') ? 'Opens Gemini Gem in a new tab' : 'Opens Gemini Share in a new tab'})`}
               className="glass-card p-3.5 rounded-xl border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between group active:scale-98"
             >
               <div>
@@ -534,7 +539,7 @@ export const ReferenceToolsBar: React.FC<ReferenceToolsBarProps> = ({
                 </p>
               </div>
               <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 group-hover:text-emerald-400 transition">
-                <span>Gemini Share ဖွင့်မည်</span>
+                <span>{tool.url.includes('/gem/') ? 'Gemini Gem ဖွင့်မည်' : 'Gemini Share ဖွင့်မည်'}</span>
                 <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition" aria-hidden="true" />
               </div>
             </a>

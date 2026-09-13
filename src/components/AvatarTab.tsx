@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Package,
   Smile,
+  Maximize2,
 } from 'lucide-react';
 import { AvatarConfig, AvatarStyle } from '../types';
 import {
@@ -172,7 +173,7 @@ export const AvatarTab: React.FC<AvatarTabProps> = ({
           </div>
         </div>
 
-        {/* AI Video Reference Image Tools (Product, Cartoon Scene, Cartoon Avatar) */}
+        {/* AI Video Reference Image Tools (Product, Cartoon Scene, Cartoon Avatar, Image Upscale) */}
         <div className="glass-card p-3 sm:p-3.5 rounded-2xl border border-slate-800 bg-slate-900/60">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
             <div className="flex items-center gap-1.5">
@@ -186,7 +187,7 @@ export const AvatarTab: React.FC<AvatarTabProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             {REFERENCE_TOOLS.map((tool) => (
               <a
                 key={tool.id}
@@ -206,6 +207,9 @@ export const AvatarTab: React.FC<AvatarTabProps> = ({
                     )}
                     {tool.category === 'avatar' && (
                       <Smile className="w-3.5 h-3.5 text-pink-400 shrink-0" />
+                    )}
+                    {tool.category === 'upscale' && (
+                      <Maximize2 className="w-3.5 h-3.5 text-violet-400 shrink-0" />
                     )}
                     <span className="text-[11px] font-semibold text-slate-200 group-hover:text-white truncate">
                       {tool.name}

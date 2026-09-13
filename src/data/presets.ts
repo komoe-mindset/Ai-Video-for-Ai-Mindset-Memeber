@@ -10,7 +10,7 @@ export interface ReferenceTool {
   description: string;
   url: string;
   badge: string;
-  category: 'product' | 'scene' | 'avatar';
+  category: 'product' | 'scene' | 'avatar' | 'upscale';
 }
 
 export const REFERENCE_TOOLS: ReferenceTool[] = [
@@ -43,6 +43,16 @@ export const REFERENCE_TOOLS: ReferenceTool[] = [
     url: 'https://gemini.google.com/share/0bfacba66746?skid=0164a496-4aa1-4d84-918f-c0e9f2d04307',
     badge: 'Cartoon Avatar',
     category: 'avatar',
+  },
+  {
+    id: 'image-upscale',
+    name: 'Image Upscale Studio',
+    nameMm: 'ရုပ်ထွက်ကြည်လင်စေသော စတူဒီယို',
+    description:
+      'AI ရုပ်ပုံများနှင့် Avatar များကို အရည်အသွေးမြင့် ရုပ်ထွက်ကြည်လင်ပြတ်သားစေရန် Upscale ပြုလုပ်ရန်',
+    url: 'https://gemini.google.com/gem/14ClxvnrGjyZVS6ywf8LFbf31PzcPMT4s?usp=sharing',
+    badge: 'Image Upscale',
+    category: 'upscale',
   },
 ];
 
